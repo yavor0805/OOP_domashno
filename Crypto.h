@@ -6,6 +6,9 @@ class Crypto{
         char name[30];
         double lastPrice;
         double currentPrice;
+        void erase(){
+            delete[] this->name;
+        }
 
     public:
         Crypto(){
@@ -29,13 +32,13 @@ class Crypto{
             SetLastPrice(lastPrice);
         }
 
-        void SetName(char* name){
+        void SetName(const char* _name){
             if(strlen(name) >= 30){
                 std::cout << "Name is too long. Setting to default.\n";
                 strcpy(this->name, "NONE");
             }
             else{
-                strcpy(this->name, name);
+	            strcpy_s(this->name, _name);
             }
         }
         char* GetName(){
@@ -90,7 +93,7 @@ class Crypto{
 
 
     ~Crypto(){
-        delete name;
+       this->erase();
     }
 
 };
