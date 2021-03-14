@@ -1,68 +1,115 @@
 #include "FilmRanking.h"
+#include<iostream>
 
-using namespace std;
-
-int main(){
-
-
-    Film test = Film();
-    test.setFilmName("The Dark Knight Rises");
-    test.setProducerName("Christopher Nolan");
-    test.setRewards(10);
-
-
-    Film test2 = Film();
-    test2.setFilmName("Jurassic Park");
-    test2.setProducerName("Steven Spielberg");
-    test2.setRewards(5);
-
-    Film test3 = Film();
-    test3.setFilmName("U.S.A");
-    test3.setProducerName("Dubioza Kolektiv");
-    test3.setRewards(1); 
-
-    Film test4 = Film();
-    test4.setFilmName("Joker");
-    test4.setProducerName("Todd Phillips");
-    test4.setRewards(50); 
-
-    Film test5 = Film();
-    test5.setFilmName("Interstellar");
-    test5.setProducerName("Christopher Nolan");
-    test5.setRewards(69); 
-
-    FilmRanking ranking = FilmRanking();
-    ranking.addFilm(test);    
-    ranking.addFilm(test2);
-    ranking.addFilm(test3);
-    ranking.addFilm(test4);
-    ranking.addFilm(test5);
-
-
-
-    FilmRanking ranking2 = FilmRanking(ranking); 
-    Film test6 = Film();
-    test6.setFilmName("The Godfather");
-    test6.setProducerName("Francis Ford Coppola");
-    test6.setRewards(500); 
-
-    ranking2.addFilm(test6);
-
-    FilmRanking ranking3 = ranking2;
-
-    Film test7 = Film();
-    test7.setFilmName("Schindler's List");
-    test7.setProducerName("Steven Spielberg");
-    test7.setRewards(101); 
-
-    ranking3.addFilm(test7);
-
-
-    ranking.printTopN(3);
-    cout << "\n------------------------\n";
-    ranking2.printTopN(4);
-    cout << "\n------------------------\n";
-    ranking3.printTopN(ranking3.getCount());
-
-    return 0;
+void swap(Film* film1, Film* film2)  
+{  
+    Film temp = *film1;  
+    *film1 = *film2;  
+    *film2 = temp;  
 }
+
+void bubbleSort(Film arr[], int n)  
+{  
+    for (int i = 0; i < n-1; i++)      
+        for (int j = 0; j < n-i-1; j++)  
+            if (arr[j].getRewards() < arr[j+1].getRewards()) 
+                swap(&arr[j], &arr[j+1]);  
+}
+
+void FilmRanking::copy(const FilmRanking& other){
+    this->size = other.size;
+    this->count = other.count;
+    this->films = new Film[size];
+    for(int i = 0; i < count; i++){
+        this->films[i]=other.films[i];
+    }
+};
+
+void FilmRanking::erase(){
+    delete[] films;
+}
+
+FilmRanking::FilmRanking(){
+    this->films = new Film[1];
+    this->films[0] = Film();
+    this->size = 1;
+    this->count= 0;        
+}
+
+FilmRanking::FilmRanking(const FilmRanking& other){
+    this->copy(other);
+}
+
+FilmRanking& FilmRanking::operator=(const FilmRanking& other){
+    if(this != &other){
+        this->erase();
+        this->copy(other);
+    }
+    return *this;
+}
+
+FilmRanking::~FilmRanking(){
+    this->erase();
+}
+
+size_t FilmRanking::getSize(){
+    return this->size;
+}
+
+size_t FilmRanking::getCount(){
+    return this->count;
+}
+
+Film FilmRanking::getFilm(int id){
+    if(id > count || id < 0) std::cout << "No such id" << std::endl;
+    else return films[id];
+}
+
+void FilmRanking::addFilm(const Film& film){
+    if(count == size){
+        Film* temp = new Film[size];
+        for(int i = 0; i < count;i++){
+            temp[i] = films[i];
+        }
+        this->size = size*2;
+        this->films = new Film[size];
+        for(int i = 0; i < count;i++){
+            films[i]=temp[i];
+        }
+        films[count] = film;
+        delete[] temp;
+        count++;
+    }
+    else{
+        films[count] = film;
+        count++;
+    }
+}
+
+void FilmRanking::printTopN(size_t n){
+    bubbleSort(films, this->count);
+    if(n > this->count){
+        for(int i = 0; i < count; i++){
+            std::cout << i+1 << ": ";
+            films[i].print();
+        }
+    }
+    else{
+        for(int i = 0; i < n; i++){
+            std::cout << i+1 << ": ";
+            films[i].print();
+        }
+    }
+}
+
+void FilmRanking::print(){
+    for(int i = 0; i < count; i++){
+        std::cout<< i << ": ";
+        films[i].print();
+    }
+}
+
+
+
+
+
